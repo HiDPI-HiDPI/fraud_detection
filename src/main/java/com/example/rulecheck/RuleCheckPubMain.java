@@ -16,7 +16,7 @@ public class RuleCheckPubMain {
 
             Socket socket = new Socket("192.168.0.64", 7777);
             OutputStream out = socket.getOutputStream();
-            String pubData = "てすとでーす！";
+            String pubData = "TEST";
             out.write(pubData.getBytes(StandardCharsets.UTF_8));
             out.close();
 
