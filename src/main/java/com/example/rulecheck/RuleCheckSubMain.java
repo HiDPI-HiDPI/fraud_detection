@@ -23,7 +23,6 @@ public class RuleCheckSubMain {
             ServerSocketChannel socket = ServerSocketChannel.open();
             Selector selector = Selector.open();){
 
-
             socket.socket().bind(new InetSocketAddress(7777));
             SocketChannel sc = socket.accept();
             sc.configureBlocking(false);
