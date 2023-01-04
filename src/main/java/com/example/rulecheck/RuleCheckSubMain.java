@@ -31,6 +31,9 @@ public class RuleCheckSubMain {
     private static final int PORT = 7777;
 
     public static final Logger logger = Logger.getLogger(SUB_LOG);
+
+    private static final int BUFFER_SIZE = 90 + 1;
+    private static final int[] SPLIT_BUFFER_SIZE_ARRAY = {3,3,3};
     
     public static void main(String[] args) throws SecurityException, IOException {
         Logger logger = Logger.getLogger(SUB_LOG);
@@ -58,11 +61,12 @@ public class RuleCheckSubMain {
             while(selector.select() > 0){
                 
                 Iterator iterator = selector.selectedKeys().iterator();
+                //System.out.println("while1");
 
                 while(iterator.hasNext()){
                     SelectionKey selectionKey = (SelectionKey)iterator.next();
                     iterator.remove();
-                    ByteBuffer bb = ByteBuffer.allocate(1024);
+                    ByteBuffer bb = ByteBuffer.allocate(BUFFER_SIZE);
 
                     if (selectionKey.isAcceptable()) {
                         //System.out.println("isAcceptable");
@@ -74,25 +78,33 @@ public class RuleCheckSubMain {
                     } else if (selectionKey.isReadable()) {
                         SocketChannel sc = (SocketChannel)selectionKey.channel();
                         //System.out.println("isReadable");
-                        selectionKey = sc.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(1024));
+                        selectionKey = sc.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(BUFFER_SIZE));
                         bb =  ByteBuffer.class.cast( selectionKey.attachment() );
+                        System.out.println(bb);    
                         if (sc.read(bb) > 0) {
                             bb.flip();
+                            for (int i : SPLIT_BUFFER_SIZE_ARRAY) {
+                                byte bytes[] = new byte[i];
+                                bb.get(bytes);
+                                System.out.println(new String(bytes, StandardCharsets.UTF_8));    
+                            }
+                            bb.position(9);
+                            byte bytes[] = new byte[1];
+                            bytes[0] = 'L';
+                            bb.limit(10);
+                            System.out.println(bb);
+                            bb.put(bytes);
+                            bb.flip();
                             sc.write(bb);
-                            bb.rewind();
-                            logger.log(Level.INFO, StandardCharsets.UTF_8.decode(bb).toString());
                         }
                     }
                 }
             }
             
-
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
 
         }
-
-
     }
 }
