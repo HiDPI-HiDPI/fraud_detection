@@ -11,20 +11,19 @@ import java.util.logging.SimpleFormatter;
 public class RuleCheckSubMain {
     
     public static void main(String[] args) throws SecurityException, IOException {
-        
+        //Loading properties
         PropertiesUtil pu = PropertiesUtil.getInstance();
-        System.out.println(pu.getValue());
 
-        Logger logger = Logger.getLogger("sub_log");
+        //Preparation for log output processing
+        Logger logger = Logger.getLogger(pu.SUB_LOG);
         Handler handler = new FileHandler(pu.SUB_LOG_FILE);
         logger.addHandler(handler);
         Formatter formatter = new SimpleFormatter();
         handler.setFormatter(formatter);
         logger.log(Level.INFO, "Start SubMain");
 
+        //Execute subscriber
         RuleCheckSubscriber sub = new RuleCheckSubscriber();
-        sub.subscriber(logger, pu);
+        sub.subscriber(logger);
     }
-
-
 }
