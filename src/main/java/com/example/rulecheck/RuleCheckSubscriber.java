@@ -17,10 +17,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RuleCheckSubscriber {
-    private static final int[] SPLIT_BUFFER_SIZE_ARRAY = {3,3,3};
-    PropertiesUtil pu = PropertiesUtil.getInstance();
+    
+    SubPropertiesUtil spu = SubPropertiesUtil.getInstance();
 
     public void subscriber(Logger logger) {
+
         //Simplify close processing with try-with-resources
         try (
             //Open ServerSocketChannel and Selector
@@ -30,8 +31,8 @@ public class RuleCheckSubscriber {
             logger.log(Level.INFO, "Opne Selector");
 
             //Bind a socket on the configured port
-            socket.socket().bind(new InetSocketAddress(pu.PORT));
-            logger.log(Level.INFO, "Bind a socket on " + pu.PORT);
+            socket.socket().bind(new InetSocketAddress(spu.PORT));
+            logger.log(Level.INFO, "Bind a socket on " + spu.PORT);
 
             //Blocking mode is false
             socket.configureBlocking(false);
@@ -81,7 +82,7 @@ public class RuleCheckSubscriber {
         sc.configureBlocking(false);
 
         //Register socket and Key (OP_READ) in selector and set ByteBuffer. 
-        sc.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(pu.BUFFER_SIZE));
+        sc.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(spu.BUFFER_SIZE));
     }
 
     void SubIO(Selector selector, SelectionKey selectionKey) throws IOException {
@@ -90,7 +91,7 @@ public class RuleCheckSubscriber {
         SocketChannel sc = (SocketChannel)selectionKey.channel();
 
         //Prepare ByteBuffer
-        ByteBuffer bb = ByteBuffer.allocate(pu.BUFFER_SIZE);
+        ByteBuffer bb = ByteBuffer.allocate(spu.BUFFER_SIZE);
         bb =  ByteBuffer.class.cast( selectionKey.attachment() );
 
         //Check read() status
@@ -103,12 +104,12 @@ public class RuleCheckSubscriber {
             //CharsetDecoder
             Charset UTF8 = StandardCharsets.UTF_8;
             CharsetDecoder cd = UTF8.newDecoder().reset();
-            CharBuffer out = CharBuffer.allocate(pu.BUFFER_SIZE);
+            CharBuffer out = CharBuffer.allocate(spu.BUFFER_SIZE);
             cd.decode(bb, out, false);
             out.flip();
 
             //Todo : Do something nice here
-            for (int i : SPLIT_BUFFER_SIZE_ARRAY) {
+            for (int i : spu.SPLIT_BUFFER_SIZE_ARRAY) {
                 char chars[] = new char[i];
                 out.get(chars);
                 String s = new String(chars);
@@ -116,13 +117,13 @@ public class RuleCheckSubscriber {
             }
 
             //Move to the end of the receive buffer
-            int LAST_POS = Arrays.stream(SPLIT_BUFFER_SIZE_ARRAY).sum();
+            int LAST_POS = Arrays.stream(spu.SPLIT_BUFFER_SIZE_ARRAY).sum();
             bb.position(LAST_POS);
             
             //Set the result to the end of the receive buffer
             byte bytes[] = new byte[1];
-            bytes = pu.RESULT.getBytes();
-            bb.limit(pu.BUFFER_SIZE);
+            bytes = spu.RESULT.getBytes();
+            bb.limit(spu.BUFFER_SIZE);
             bb.put(bytes);
 
             //Return to Pub

@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+import java.util.stream.Stream;
 
-public class PropertiesUtil {
-    private static PropertiesUtil propertiesUtil = new PropertiesUtil();
+public class SubPropertiesUtil {
+    private static SubPropertiesUtil subPropertiesUtil = new SubPropertiesUtil();
 
     //Get instantiation time
     private final LocalDateTime date = LocalDateTime.now();
@@ -25,9 +26,10 @@ public class PropertiesUtil {
     public final String SUB_LOG_FILE;
     public final int PORT;
     public final int BUFFER_SIZE;
+    public final int[] SPLIT_BUFFER_SIZE_ARRAY;
     public final String RESULT;
 
-    private PropertiesUtil() {
+    private SubPropertiesUtil() {
 
         Properties properties = new Properties();
         FileInputStream in = null;
@@ -41,17 +43,20 @@ public class PropertiesUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SUB_LOG = properties.getProperty("src.main.java.com.example.rulecheck.SUB_LOG");
-        LOG_FILE_PATH = properties.getProperty("src.main.java.com.example.rulecheck.LOG_FILE_PATH");
-        LOG_FILE_NAME = properties.getProperty("src.main.java.com.example.rulecheck.LOG_FILE_NAME");
-        SUB_LOG_FILE = LOG_FILE_PATH + LOG_FILE_NAME + "_" + bootTime + ".log";
-        PORT = Integer.parseInt( properties.getProperty("src.main.java.com.example.rulecheck.PORT") );
-        BUFFER_SIZE = Integer.parseInt(
+        SUB_LOG                 = properties.getProperty("src.main.java.com.example.rulecheck.SUB_LOG");
+        LOG_FILE_PATH           = properties.getProperty("src.main.java.com.example.rulecheck.LOG_FILE_PATH");
+        LOG_FILE_NAME           = properties.getProperty("src.main.java.com.example.rulecheck.LOG_FILE_NAME");
+        SUB_LOG_FILE            = LOG_FILE_PATH + LOG_FILE_NAME + "_" + bootTime + ".log";
+        PORT                    = Integer.parseInt( properties.getProperty("src.main.java.com.example.rulecheck.PORT") );
+        BUFFER_SIZE             = Integer.parseInt(
             properties.getProperty("src.main.java.com.example.rulecheck.BUFFER_SIZE") ) + 1;
-        RESULT = properties.getProperty("src.main.java.com.example.rulecheck.RESULT");
+        SPLIT_BUFFER_SIZE_ARRAY = Stream.of(
+            properties.getProperty("src.main.java.com.example.rulecheck.SPLIT_BUFFER_SIZE_ARRAY").split(",")
+            ).mapToInt(Integer::parseInt).toArray();
+        RESULT                  = properties.getProperty("src.main.java.com.example.rulecheck.RESULT");
     }
 
-    public static PropertiesUtil getInstance(){
-        return propertiesUtil;
+    public static SubPropertiesUtil getInstance(){
+        return subPropertiesUtil;
     }
 }

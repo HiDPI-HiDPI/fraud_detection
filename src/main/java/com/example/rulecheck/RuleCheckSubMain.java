@@ -12,11 +12,11 @@ public class RuleCheckSubMain {
     
     public static void main(String[] args) throws SecurityException, IOException {
         //Loading properties
-        PropertiesUtil pu = PropertiesUtil.getInstance();
+        SubPropertiesUtil spu = SubPropertiesUtil.getInstance();
 
         //Preparation for log output processing
-        Logger logger = Logger.getLogger(pu.SUB_LOG);
-        Handler handler = new FileHandler(pu.SUB_LOG_FILE);
+        Logger logger = Logger.getLogger(spu.SUB_LOG);
+        Handler handler = new FileHandler(spu.SUB_LOG_FILE);
         logger.addHandler(handler);
         Formatter formatter = new SimpleFormatter();
         handler.setFormatter(formatter);
